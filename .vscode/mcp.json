@@ -1,0 +1,11 @@
+{
+"servers": {
+  "tines": {
+    "command": "uv",
+    "args": ["run","main.py"],
+    "env": {
+      "PYTHONPATH": "."
+    }
+  }
+}
+}
