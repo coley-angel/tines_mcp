@@ -229,7 +229,9 @@ def update_story(
     folder_id: Optional[int] = None,
     change_control_enabled: Optional[bool] = None,
     draft_id: Optional[int] = None,
-    monitor_failures: Optional[bool] = None
+    monitor_failures: Optional[bool] = None,
+    entry_action_id: Optional[int] = None,
+    exit_action_ids: Optional[List[int]] = None
 ) -> Dict[str, Any]:
     """Update a story in Tines.
     
@@ -253,6 +255,8 @@ def update_story(
         change_control_enabled: Whether Change Control is enabled
         draft_id: The ID of the draft to update
         monitor_failures: Whether monitor failures is enabled on the story
+        entry_action_id: The ID of the entry action for send to story (webhook)
+        exit_action_ids: Array of IDs for exit actions (event transforms)
     
     Returns:
         Dict containing the updated story details
@@ -295,6 +299,10 @@ def update_story(
         update_data['draft_id'] = draft_id
     if monitor_failures is not None:
         update_data['monitor_failures'] = monitor_failures
+    if entry_action_id is not None:
+        update_data['entry_action_id'] = entry_action_id
+    if exit_action_ids is not None:
+        update_data['exit_action_ids'] = exit_action_ids
     
     return make_request("PUT", f"stories/{story_id}", data=update_data)
 
@@ -388,9 +396,9 @@ def create_action(
     story_id: int,
     action_type: str,
     name: str,
-    draft_id: int,
     options: Optional[Dict[str, Any]] = None,
-    position: Optional[Dict[str, Any]] = None
+    position: Optional[Dict[str, Any]] = None,
+    draft_id: Optional[int] = None
 ) -> Dict[str, Any]:
     """Create a new action in a story.
     
@@ -407,9 +415,10 @@ def create_action(
                     'Agents::GroupAgent'
                     'Agents::LLMAgent' (AI/LLM actions)
         name: Name for the action
-        draft_id: ID of the draft to add the action to (required)
         options: Configuration options for the action
         position: Position coordinates for the action in the story canvas
+        draft_id: ID of the draft to add the action to (optional, but required
+                 when change control is enabled)
     
     Returns:
         Dict containing the created action details
@@ -418,8 +427,11 @@ def create_action(
         "type": action_type,
         "name": name,
         "story_id": str(story_id),  # Convert to string per API example
-        "draft_id": draft_id
     }
+    
+    # Add draft_id if provided (required for change control enabled stories)
+    if draft_id is not None:
+        data["draft_id"] = draft_id
     
     if options:
         data["options"] = options
@@ -470,9 +482,9 @@ def create_event_transform_action(
         story_id=story_id,
         action_type="Agents::EventTransformationAgent",
         name=name,
-        draft_id=draft_id,
         options=options,
-        position=position
+        position=position,
+        draft_id=draft_id
     )
 
 
@@ -503,9 +515,9 @@ def create_webhook_action(
         story_id=story_id,
         action_type="Agents::WebhookAgent",
         name=name,
-        draft_id=draft_id,
         options=options,
-        position=position
+        position=position,
+        draft_id=draft_id
     )
 
 
@@ -558,9 +570,9 @@ def create_email_action(
         story_id=story_id,
         action_type="Agents::EmailAgent",
         name=name,
-        draft_id=draft_id,
         options=options,
-        position=position
+        position=position,
+        draft_id=draft_id
     )
 
 
@@ -611,9 +623,9 @@ def create_imap_action(
         story_id=story_id,
         action_type="Agents::IMAPAgent",
         name=name,
-        draft_id=draft_id,
         options=options,
-        position=position
+        position=position,
+        draft_id=draft_id
     )
 
 
@@ -649,9 +661,9 @@ def create_send_to_story_action(
         story_id=story_id,
         action_type="Agents::SendToStoryAgent",
         name=name,
-        draft_id=draft_id,
         options=options,
-        position=position
+        position=position,
+        draft_id=draft_id
     )
 
 
@@ -687,9 +699,9 @@ def create_trigger_action(
         story_id=story_id,
         action_type="Agents::TriggerAgent",
         name=name,
-        draft_id=draft_id,
         options=options,
-        position=position
+        position=position,
+        draft_id=draft_id
     )
 
 
@@ -720,9 +732,9 @@ def create_group_action(
         story_id=story_id,
         action_type="Agents::GroupAgent",
         name=name,
-        draft_id=draft_id,
         options=options,
-        position=position
+        position=position,
+        draft_id=draft_id
     )
 
 
@@ -756,9 +768,9 @@ def create_llm_action(
         story_id=story_id,
         action_type="Agents::LLMAgent",
         name=name,
-        draft_id=draft_id,
         options=options,
-        position=position
+        position=position,
+        draft_id=draft_id
     )
 
 
