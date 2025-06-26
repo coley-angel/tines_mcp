@@ -888,6 +888,38 @@ def get_story_draft(story_id: int, draft_id: int) -> Dict[str, Any]:
     return make_request("GET", f"stories/{story_id}/drafts/{draft_id}")
 
 
+def create_story_draft(story_id: int) -> Dict[str, Any]:
+    """Create a new draft for a story by making a minimal change.
+    
+    Args:
+        story_id: ID of the story to create a draft for
+    
+    Returns:
+        Dict containing the created draft details
+    """
+    # Create a draft by making a minimal change to the story
+    # We'll add a tag temporarily to force draft creation
+    try:
+        make_request("PUT", f"stories/{story_id}", data={
+            "add_tag_names": ["draft-creation"]
+        })
+        # If successful, get the draft that was created
+        drafts = list_story_drafts(story_id)
+        if drafts.get("drafts"):
+            latest_draft = drafts["drafts"][0]  # Get the most recent draft
+            # Remove the temporary tag
+            make_request("PUT", f"stories/{story_id}", data={
+                "remove_tag_names": ["draft-creation"],
+                "draft_id": latest_draft["id"]
+            })
+            return latest_draft
+        else:
+            raise ValueError("No draft was created")
+    except Exception as e:
+        logger.error(f"Failed to create draft: {e}")
+        raise
+
+
 # Notes/Comments Functions
 def create_note(
     content: str,
@@ -1052,6 +1084,8 @@ def register_tools():
     # Story draft tools
     mcp.add_tool(list_story_drafts)
     mcp.add_tool(get_story_draft)
+    mcp.add_tool(create_story_draft)
+    mcp.add_tool(create_story_draft)
     
     # Action management tools
     mcp.add_tool(get_story_actions)
