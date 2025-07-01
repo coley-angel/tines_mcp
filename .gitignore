@@ -129,6 +129,7 @@ cython_debug/
 #  be added to the global gitignore or merged into this project gitignore.  For a PyCharm
 #  project, the following directory is recommended to be ignored:
 .idea/
+prd/
 
 # VS Code
 .vscode/settings.json

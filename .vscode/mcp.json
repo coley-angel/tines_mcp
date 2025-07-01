@@ -1,11 +1,27 @@
 {
-"servers": {
-  "tines": {
-    "command": "uv",
-    "args": ["run","main.py"],
-    "env": {
-      "PYTHONPATH": "."
+      "inputs": [
+      {
+        "id": "tinesApiToken",
+        "description": "Tines API token",
+        "type": "promptString",
+        "password": true
+      },
+      {
+        "id": "tinesApiUrl",
+        "description": "Tines API URL (e.g., https://your-tenant.tines.com/api/v1)",
+        "type": "promptString"
+      }
+    ],
+  "servers": {
+    "tines": {
+      "command": "uv",
+      "args": ["run", "main.py"],
+      "env": {
+        "PYTHONPATH": ".",
+        "TINES_API_TOKEN": "${input:tinesApiToken}",
+        "TINES_API_URL": "${input:tinesApiUrl}"
+      }
     }
   }
 }
-}
+

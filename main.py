@@ -22,7 +22,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+try:
+    load_dotenv()
+    logger.info("Environment variables loaded from .env file")
+except Exception as e:
+    logger.warning(f"Failed to load .env file: {e}. Using existing environment variables.")
 
 # Initialize FastMCP
 mcp = FastMCP("TinesMCP")
@@ -30,12 +34,21 @@ mcp = FastMCP("TinesMCP")
 # Setup base configuration
 TOKEN = os.getenv("TINES_API_TOKEN")
 if not TOKEN:
+    logger.error("TINES_API_TOKEN environment variable is not set")
+    logger.error("Please set your Tines API token in the environment or .env file")
+    logger.error("Example: TINES_API_TOKEN=your_api_token_here")
     raise ValueError("TINES_API_TOKEN environment variable is not set")
 
 # Get the base URL from env, default to tines.com but user should provide their tenant domain
 BASE_URL = os.getenv("TINES_API_URL")
 if not BASE_URL:
+    logger.error("TINES_API_URL environment variable is not set")
+    logger.error("Please set your Tines API URL in the environment or .env file")
+    logger.error("Example: TINES_API_URL=https://your-tenant.tines.com/api/v1")
     raise ValueError("TINES_API_URL environment variable is not set. Use format: https://your-tenant.tines.com/api/v1")
+
+logger.info(f"Tines MCP Server initialized with API URL: {BASE_URL}")
+logger.info("API Token loaded successfully")
 
 
 def make_request(method: str, endpoint: str, data: Optional[Dict] = None, params: Optional[Dict] = None) -> Dict[str, Any]:

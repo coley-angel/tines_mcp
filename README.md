@@ -15,7 +15,48 @@ A Model Context Protocol (MCP) server that provides tools for interacting with T
 - Python 3.8 or higher
 - [uv](https://docs.astral.sh/uv/) - Fast Python package installer and resolver
 - A Tines account with API access
-- VS Code (for MCP integration)
+- VS Code (for MCP integration) or any MCP-compatible AI assistant
+
+## Configuration
+
+### 1. Environment Variables
+
+The Tines MCP Server requires two environment variables to be set:
+
+- `TINES_API_TOKEN`: Your Tines API token
+- `TINES_API_URL`: Your Tines tenant API URL
+
+### 2. Getting Your Tines Credentials
+
+**API Token:**
+1. Log into your Tines tenant
+2. Go to Settings > API
+3. Click "Create Token"
+4. Copy the generated token
+
+**API URL:**
+- Replace `your-tenant` with your actual Tines tenant name
+- Format: `https://your-tenant.tines.com/api/v1`
+- Example: `https://acme.tines.com/api/v1`
+
+### 3. Setting Up Environment Variables
+
+**Option A: Using .env file (Recommended)**
+1. Copy the template: `cp .env.template .env`
+2. Edit `.env` and fill in your values:
+```env
+TINES_API_TOKEN=your_actual_api_token_here
+TINES_API_URL=https://your-tenant.tines.com/api/v1
+```
+
+**Option B: Using system environment variables**
+```bash
+export TINES_API_TOKEN="your_actual_api_token_here"
+export TINES_API_URL="https://your-tenant.tines.com/api/v1"
+```
+
+**Option C: Using VS Code MCP configuration**
+The MCP configuration in `.vscode/mcp.json` will automatically pick up environment variables `TINES_API_TOKEN` and `TINES_API_URL` when the server starts.
 
 ## Installation
 
@@ -76,7 +117,29 @@ This MCP server is designed to work with VS Code and AI assistants that support 
 
 #### 1. VS Code MCP Configuration
 
-The repository includes a VS Code MCP configuration file at `.vscode/mcp.json`. This configuration tells VS Code how to connect to the Tines MCP server.
+The repository includes a VS Code MCP configuration file at `.vscode/mcp.json`. This configuration:
+- Automatically loads environment variables (`TINES_API_TOKEN` and `TINES_API_URL`)
+- Tells VS Code how to connect to the Tines MCP server
+- Uses `uv` to run the Python server
+
+**Configuration contents:**
+```json
+{
+  "servers": {
+    "tines": {
+      "command": "uv",
+      "args": ["run", "main.py"],
+      "env": {
+        "PYTHONPATH": ".",
+        "TINES_API_TOKEN": "${TINES_API_TOKEN}",
+        "TINES_API_URL": "${TINES_API_URL}"
+      }
+    }
+  }
+}
+```
+
+**Important:** Make sure your environment variables are set before starting VS Code, or use a `.env` file in the project root.
 
 #### 2. Start the MCP Server
 
@@ -204,6 +267,13 @@ tines_mcp/
 - Ensure the API URL format is correct: `https://your-tenant.tines.com/api/v1`
 
 **API Authentication errors:**
+**Configuration issues:**
+- Check that `TINES_API_TOKEN` and `TINES_API_URL` environment variables are set
+- Verify your `.env` file exists and contains valid values
+- For VS Code: restart VS Code after setting environment variables
+- Test environment variables: `echo $TINES_API_TOKEN` (should not be empty)
+
+**Authentication issues:**
 - Verify your API token in Tines Settings → API Keys
 - Check that the token hasn't expired
 - Ensure your user has appropriate permissions for the operations you're trying to perform
@@ -212,6 +282,7 @@ tines_mcp/
 - Restart VS Code after configuring MCP
 - Check the VS Code developer console for error messages
 - Verify the `.vscode/mcp.json` configuration is correct
+- Ensure environment variables are available in VS Code's environment
 
 ### Logging
 
