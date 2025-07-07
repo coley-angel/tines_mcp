@@ -14,10 +14,9 @@
     ],
   "servers": {
     "tines": {
-      "command": "uv",
-      "args": ["run", "main.py"],
+      "command": "uvx",
+      "args": ["--from", "https://github.com/coley-angel/tines_mcp.git", "python", "main.py"],
       "env": {
-        "PYTHONPATH": ".",
         "TINES_API_TOKEN": "${input:tinesApiToken}",
         "TINES_API_URL": "${input:tinesApiUrl}"
       }
